@@ -2,7 +2,6 @@ local wibox = require("wibox")
 local awful = require("awful")
 local lgi = require("lgi")
 
--- Try to load NetworkManager (NM). Safely fail if not present.
 local NM = nil
 local status, result = pcall(function()
 	return lgi.require("NM", "1.0")
@@ -10,7 +9,6 @@ end)
 if status then
 	NM = result
 end
--- CONFIGURATION: Font and Icons
 local icon_font = "Nerd Font 14"
 
 local icon_widget = wibox.widget({
@@ -18,7 +16,7 @@ local icon_widget = wibox.widget({
 	font = icon_font,
 	align = "center",
 	valign = "center",
-	forced_width = 90, -- Reserve space for icon
+	forced_width = 90, -- Reserve space for icon WARN: too small will make it show as ...
 })
 
 local text_widget = wibox.widget({
@@ -36,21 +34,21 @@ local wifi_widget = wibox.widget({
 -- Helper: Convert signal strength (0-100) to Icon
 local function get_wifi_glyph(strength)
 	if strength >= 75 then
-		return "  " -- High (f1eb)
+		return "  "
 	elseif strength >= 50 then
-		return "  " -- Medium (f6aa)
+		return "  "
 	elseif strength >= 25 then
-		return " 󰤠 " -- Low (f6aa)
+		return " 󰤠 "
 	else
 		return " 󰖪 "
-	end -- Very Low/None (f6ac)
+	end
 end
 
 -- Helper: Convert signal strength to Color
 local function get_color(strength, is_connected)
 	if not is_connected then
 		return "#ff6c6b"
-	end -- Red
+	end
 
 	if strength >= 75 then
 		return "#98be65"
@@ -79,7 +77,7 @@ local function update_wifi(client)
 	local active_conn = client.primary_connection
 
 	if active_conn then
-		local dev = active_conn.specific_object_path -- Sometimes implies device, but let's look at devices
+		local dev = active_conn.specific_object_path
 
 		local conn_type = active_conn:get_connection_type()
 
@@ -96,7 +94,7 @@ local function update_wifi(client)
 				color = get_color(strength, true)
 			end
 		else
-			glyph = "󰈀 " -- Ethernet icon
+			glyph = "󰈀 "
 			text = "Eth"
 			color = "#98be65"
 		end
@@ -114,7 +112,6 @@ local function init()
 		return wifi_widget
 	end
 
-	-- Initialize the NetworkManager Client
 	local client = NM.Client.new()
 
 	if not client then
